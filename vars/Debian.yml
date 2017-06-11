@@ -1,0 +1,8 @@
+
+# Debian family vars file for perl5-install
+---
+perl5_build_dependencies:
+        - make
+        - gcc
+        - tar
+        - gzip

@@ -1,0 +1,54 @@
+---
+# tasks file for perl5-install# tasks/perl5_install.yml
+- name: download perl5 
+  uri:
+     url: "{{ perl5_url }}"
+     method: GET
+     return_content: yes
+     validate_certs: no 
+     dest: "{{ src_dir }}/{{ perl5_package }}"
+     creates: no
+  tags: perl5_install
+
+- name: install packages needed for building perl5 (yum)
+  yum: name={{ item }} state=installed
+  with_items: "{{ perl5_build_dependencies }}"
+  when:
+   - ansible_os_family == 'RedHat'
+  tags: perl5_install
+
+- name: install packages needed for building perl5 (apt)
+  apt: name={{ item }} state=installed update_cache=yes cache_valid_time=3600
+  with_items: "{{ perl5_build_dependencies }}"
+  when:
+    - ansible_os_family == 'Debian'
+  tags: perl5_install
+
+- name: decompress perl5 (tar, ansible currently lacks of bz2 handling)
+  command: "tar -xjvf {{ src_dir }}/{{ perl5_package }}" 
+  args:
+     chdir: "{{ src_dir }}"
+  tags: perl5_install
+
+- name: create install path perl5
+  file: path="{{ perl5_real_path }}" state=directory
+  tags: perl5_install
+
+- name: configure perl5
+  command: "./Configure {{ perl5_build_opts }} -Dprefix={{ perl5_real_path }}"
+  args:
+     chdir: "{{ src_dir }}/{{ perl5_name }}"
+  tags: perl5_install
+
+- name: build perl5 (make) 
+  make: chdir="{{ src_dir }}/{{ perl5_name }}" 
+  tags: perl5_install
+
+- name: build install perl5 (make) 
+  make: 
+    chdir: "{{ src_dir }}/{{ perl5_name }}" 
+    target: install
+    params:
+      prefix: "{{ perl5_real_path }}"
+  tags: perl5_install
+

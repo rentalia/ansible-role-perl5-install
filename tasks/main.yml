@@ -1,0 +1,64 @@
+---
+# tasks file for perl5-install# tasks/main.yml
+
+- name: set distro-specific variables
+  include_vars: '{{ item }}'
+  with_first_found:
+   - '{{ ansible_os_family }}.yml'
+  tags: perl5_install
+
+- name: install GNU stow (yum)
+  yum: name=stow state=present update_cache=yes
+  when: ansible_os_family == 'RedHat'
+  tags: stow_install
+
+- name: install GNU stow (apt)
+  apt: name=stow state=present update_cache=yes
+  when: ansible_os_family == 'Debian'
+  tags: stow_install
+
+- name: create stow dir
+  file: path="{{ stow_dir }}" state=directory
+  tags: stow_install
+
+- name: check perl5 installation (try-catch)
+  command: "{{ perl5_local_path }}/bin/perl -v"
+  register: isPerl
+  ignore_errors: True
+  tags: perl5_install
+
+- name: fail the playbook if there is a different perl version installed 
+  fail: msg="Another perl is installed at {{ perl5_local_path }}."
+  when: ( isPerl.rc == 0 ) and ( isPerl.stdout.find("v{{ perl5_version }}") ==-1)
+  tags: perl5_install
+
+- name: perl build and install 
+  include: perl5_install.yml
+  when: ( isPerl.rc >= 1 ) 
+  tags: perl5_install
+
+- name: check cpanminus installation 
+  command: "{{ perl5_real_path }}/bin/cpanm -v"
+  register: isCpanminus
+  ignore_errors: True
+  tags: perl5_install
+
+- name: install cpanminus 
+  get_url:
+    url: https://cpanmin.us/
+    dest: "{{ perl5_real_path }}/bin/cpanm"
+    mode: 0755
+  when: isCpanminus.rc >= 1 
+  tags: perl5_install
+
+- name: install cpm (experimental) (cpanminus)
+  command: "{{ perl5_real_path }}/bin/perl {{ perl5_real_path }}/bin/cpanm -nq App::cpm"
+  when: (cpm_install == True)
+  tags: perl5_modules
+
+- name: configure perl path (stow)
+  command: "stow -S {{ perl5_name }} {{ stow_opts }} --target={{ perl5_local_path }}"
+  args: 
+       chdir: "{{ stow_dir }}"
+  tags: perl5_install
+

@@ -22,6 +22,7 @@ Other configurable vars at defaults/main.yml:
 - perl5_url: default value: "http://www.cpan.org/src/5.0/{{ perl5_package }}"
 - perl5_real_path: "{{ stow_dir }}/{{ perl5_name }}"
 - perl5_build_opts: "-des"
+- cpm_install: install cpm package manager. Default value: False
 
 Vars at vars/*os family*.yml
 - perl5_build_dependencies: list of package names needed to build perl.

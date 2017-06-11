@@ -1,6 +1,6 @@
 Ansible role: perl5-install
 =========
-Perl 5 build from source and install. Also it installs cpanm and cpm for perl modules management, and GNU stow for path management at OS level.
+Perl 5 build and install from source. Also it installs cpanm and cpm for perl modules management, and GNU stow for path management at OS level.
 
 Requirements
 ------------
@@ -36,7 +36,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-         - perl5-install
+         - rentalia.perl5-install
       vars:
         perl5_version: "5.26.0"
         cpm_install: True

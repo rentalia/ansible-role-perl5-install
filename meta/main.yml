@@ -1,6 +1,6 @@
 galaxy_info:
   author: frantsao
-  description: perl5 custom build and install from source. It alsoinstalls cpanm and cpm, and GNU stow for path management
+  description: perl5 custom build and install from source. It also installs cpanm and cpm, and GNU stow for path management
   company: Rentalia S.L.U.
   license: GPLv3
   min_ansible_version: 2.1

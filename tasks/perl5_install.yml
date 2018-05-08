@@ -24,10 +24,11 @@
     - ansible_os_family == 'Debian'
   tags: perl5_install
 
-- name: decompress perl5 (tar, ansible currently lacks of bz2 handling)
-  command: "tar -xjvf {{ src_dir }}/{{ perl5_package }}" 
-  args:
-     chdir: "{{ src_dir }}"
+- name: decompress perl5
+  unarchive:
+     src: "{{ src_dir }}/{{ perl5_package }}"
+     dest: "{{ src_dir }}"
+     remote_src: yes
   tags: perl5_install
 
 - name: create install path perl5

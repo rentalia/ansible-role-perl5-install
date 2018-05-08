@@ -30,11 +30,12 @@
   command: "{{ perl5_local_path }}/bin/perl -v"
   register: isPerl
   ignore_errors: True
+  changed_when: isPerl.rc != 0
   tags: perl5_install
 
 - name: fail the playbook if there is a different perl version installed 
   fail: msg="Another perl is installed at {{ perl5_local_path }}."
-  when: ( isPerl.rc == 0 ) and ( isPerl.stdout.find("v{{ perl5_version }}") ==-1)
+  when: ( isPerl.rc == 0 ) and ( isPerl.stdout.find( perl5_version ) ==-1)
   tags: perl5_install
 
 - name: perl build and install 
@@ -45,6 +46,7 @@
 - name: check cpanminus installation 
   command: "{{ perl5_real_path }}/bin/cpanm -v"
   register: isCpanminus
+  changed_when: isCpanminus.rc != 0
   ignore_errors: True
   tags: perl5_install
 

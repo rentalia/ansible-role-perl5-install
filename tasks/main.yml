@@ -7,6 +7,11 @@
    - '{{ ansible_os_family }}.yml'
   tags: perl5_install
 
+- name: install EPEL repo (yum)
+  yum: name=epel-release state=present update_cache=yes
+  when: ansible_os_family == 'RedHat'
+  tags: stow_install
+
 - name: install GNU stow (yum)
   yum: name=stow state=present update_cache=yes
   when: ansible_os_family == 'RedHat'
@@ -33,7 +38,7 @@
   tags: perl5_install
 
 - name: perl build and install 
-  include: perl5_install.yml
+  include_tasks: perl5_install.yml
   when: ( isPerl.rc >= 1 ) 
   tags: perl5_install
 
